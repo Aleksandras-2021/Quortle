@@ -18,7 +18,7 @@ let validWords = new Set();
 
 async function loadValidWords() {
   try {
-    const res = await fetch("words.txt");
+    const res = await fetch("../words.txt");
     const text = await res.text();
     const words = text.split("\n").map(w => w.trim().toLowerCase()).filter(w => w.length === 4);
     validWords = new Set(words);

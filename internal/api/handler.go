@@ -23,7 +23,7 @@ func (h *Handler) Routes() http.Handler {
 		w.Header().Set("Content-Type", "text/plain")
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 
-		data, err := os.ReadFile("words.txt")
+		data, err := os.ReadFile("../words.txt")
 		if err != nil {
 			http.Error(w, "Unable to read words.txt", http.StatusInternalServerError)
 			return
