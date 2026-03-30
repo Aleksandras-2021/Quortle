@@ -57,7 +57,7 @@ function initKeyboard() {
 // Fetch today's word
 async function fetchWord() {
   try {
-    const res = await fetch("http://localhost:8080/word/random");
+    const res = await fetch("/word/random");
     const data = await res.json();
     word = data.word.toLowerCase();
     console.log("For testing purposes a daily word is printed here: ", word);
