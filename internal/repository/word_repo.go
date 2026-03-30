@@ -2,9 +2,7 @@ package repository
 
 import (
 	"bufio"
-	"encoding/json"
 	"os"
-	"time"
 )
 
 type WordRepository struct {
@@ -49,36 +47,4 @@ func (r *WordRepository) SaveWords(words []string) error {
 	}
 
 	return nil
-}
-
-// Save today's word
-func (r *WordRepository) SaveCurrentWord(word string) error {
-	data := CurrentWord{
-		Date: time.Now().Format("2006-01-02"),
-		Word: word,
-	}
-
-	file, err := os.Create("current_word.json")
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	return json.NewEncoder(file).Encode(data)
-}
-
-// Load today's word
-func (r *WordRepository) LoadCurrentWord() (string, string, error) {
-	file, err := os.Open("current_word.json")
-	if err != nil {
-		return "", "", err
-	}
-	defer file.Close()
-
-	var data CurrentWord
-	if err := json.NewDecoder(file).Decode(&data); err != nil {
-		return "", "", err
-	}
-
-	return data.Date, data.Word, nil
 }

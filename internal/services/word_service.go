@@ -1,6 +1,7 @@
 package services
 
 import (
+	"fmt"
 	"math/rand"
 	"time"
 
@@ -18,35 +19,17 @@ func NewWordService(r *repository.WordRepository) *WordService {
 
 // Get the word for today
 func (s *WordService) GetWordOfTheDay() (string, error) {
-	today := time.Now().Format("2006-01-02")
-
-	// Load previous word
-	date, word, err := s.repo.LoadCurrentWord()
-	if err == nil && date == today {
-		return word, nil
-	}
-
-	// Load all words
 	words, err := s.repo.LoadWords()
 	if err != nil {
 		return "", err
 	}
 
 	if len(words) == 0 {
-		return "No more words left", nil // no more words left
+		return "", fmt.Errorf("no words available")
 	}
 
-	idx := rand.Intn(len(words))
-	word = words[idx]
-
-	words = append(words[:idx], words[idx+1:]...)
-
-	if err := s.repo.SaveWords(words); err != nil {
-		return "", err
-	}
-	if err := s.repo.SaveCurrentWord(word); err != nil {
-		return "", err
-	}
+	days := int(time.Now().Unix() / 86400)
+	word := words[days%len(words)]
 
 	return word, nil
 }
