@@ -23,7 +23,7 @@ func (s *WordService) GetWordOfTheDay() (string, error) {
 	// Load previous word
 	date, word, err := s.repo.LoadCurrentWord()
 	if err == nil && date == today {
-		return word, nil // same word today
+		return word, nil
 	}
 
 	// Load all words

@@ -31,7 +31,8 @@ func (h *Handler) Routes() http.Handler {
 		w.Write(data)
 	})
 
-	mux.Handle("/", http.FileServer(http.Dir("./frontend")))
+	fs := http.FileServer(http.Dir("../frontend"))
+	mux.Handle("/", http.StripPrefix("/", fs))
 
 	return mux
 }

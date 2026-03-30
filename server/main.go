@@ -14,9 +14,11 @@ func main() {
 	svc := services.NewWordService(repo)
 	handler := api.NewHandler(svc)
 
-	// Wrap handler with CORS
+	mux := handler.Routes() // create once
+
+	// Wrap mux with CORS
 	corsHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "*") // allow all origins
+		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 
@@ -25,7 +27,7 @@ func main() {
 			return
 		}
 
-		handler.Routes().ServeHTTP(w, r)
+		mux.ServeHTTP(w, r) // reuse mux
 	})
 
 	log.Println("Server running on :8080")
