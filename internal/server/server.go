@@ -3,7 +3,9 @@ package server
 import (
 	"log"
 	"net/http"
+	"os"
 
+	"github.com/joho/godotenv"
 	"golang.org/x/crypto/acme/autocert"
 )
 
@@ -20,6 +22,19 @@ func NewServer(handler http.Handler, domain string) *Server {
 }
 
 func (s *Server) Start() {
+	// Load .env
+	_ = godotenv.Load()
+
+	localMode := os.Getenv("LOCAL") == "true"
+
+	if localMode {
+		// LOCAL HTTP mode
+		log.Println("Starting server in LOCAL HTTP mode on :8080")
+		log.Fatal(http.ListenAndServe(":8080", s.Handler))
+		return
+	}
+
+	// PRODUCTION HTTPS mode
 	certManager := &autocert.Manager{
 		Cache:      autocert.DirCache("certs"),
 		Prompt:     autocert.AcceptTOS,
@@ -37,5 +52,5 @@ func (s *Server) Start() {
 	}
 
 	log.Printf("HTTPS server running on :443 for domain %s\n", s.Domain)
-	server.ListenAndServeTLS("", "")
+	log.Fatal(server.ListenAndServeTLS("", ""))
 }
