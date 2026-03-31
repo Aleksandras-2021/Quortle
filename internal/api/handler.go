@@ -23,7 +23,7 @@ func (h *Handler) Routes() http.Handler {
 		w.Header().Set("Content-Type", "text/plain")
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 
-		data, err := os.ReadFile("../words.txt")
+		data, err := os.ReadFile("words.txt")
 		if err != nil {
 			http.Error(w, "Unable to read words.txt", http.StatusInternalServerError)
 			return
@@ -31,7 +31,7 @@ func (h *Handler) Routes() http.Handler {
 		w.Write(data)
 	})
 
-	fs := http.FileServer(http.Dir("../frontend"))
+	fs := http.FileServer(http.Dir("./frontend"))
 	mux.Handle("/", http.StripPrefix("/", fs))
 
 	return mux

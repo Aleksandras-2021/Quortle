@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	repo := &repository.WordRepository{FilePath: "../words.txt"}
+	repo := &repository.WordRepository{FilePath: "words.txt"}
 	svc := services.NewWordService(repo)
 	handler := api.NewHandler(svc)
 

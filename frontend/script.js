@@ -3,7 +3,7 @@ const keyboardDiv = document.getElementById("keyboard");
 const messageDiv = document.getElementById("message");
 
 let word = "";
-const maxRows = 4;
+const maxRows = 5;
 let currentRow = 0;
 let guesses = JSON.parse(localStorage.getItem("quortle-guesses") || "[]");
 
@@ -11,7 +11,7 @@ let guesses = JSON.parse(localStorage.getItem("quortle-guesses") || "[]");
 const keys = [
   "QWERTYUIOP".split(""),
   "ASDFGHJKL".split(""),
-  ["Enter","Z","X","C","V","B","N","M","Backspace"]
+  ["Enter", "Z", "X", "C", "V", "B", "N", "M", "⌫"]
 ];
 
 let validWords = new Set();
@@ -49,8 +49,10 @@ function initKeyboard() {
     const key = document.createElement("button");
     key.textContent = k;
     key.classList.add("key");
-    key.addEventListener("click", () => handleKey(k));
-    keyboardDiv.appendChild(key);
+    key.addEventListener("click", (e) => {
+      handleKey(k);
+      e.target.blur(); //  THIS FIXES IT
+    }); keyboardDiv.appendChild(key);
   });
 }
 
@@ -71,22 +73,22 @@ function handleKey(k) {
   if (currentRow >= maxRows) return;
 
   let guess = getCurrentGuess();
-  if (k === "Backspace") {
+  if (k === "backspace" || k === "⌫") {
     guess = guess.slice(0, -1);
     setCurrentGuess(guess);
   } else if (k === "Enter") {
-  if (guess.length < 4) {
-    alert("Enter a 4-letter word");
-    return;
-  }
-  if (!validWords.has(guess.toLowerCase())) {
-    // Word not valid
-    messageDiv.textContent = "❌ Not a valid word";
-    shakeRow(currentRow); // optional visual feedback
-    return;
-  }
-  // Word is valid
-  checkGuess(guess);
+    if (guess.length < 4) {
+      alert("Enter a 4-letter word");
+      return;
+    }
+    if (!validWords.has(guess.toLowerCase())) {
+      // Word not valid
+      messageDiv.textContent = "Not a valid word";
+      shakeRow(currentRow); // Visual feedback
+      return;
+    }
+    // Word is valid
+    checkGuess(guess);
   } else if (guess.length < 4 && k.length === 1) {
     guess += k.toLowerCase();
     setCurrentGuess(guess);
@@ -130,7 +132,9 @@ function checkGuess(guess) {
       if (keyBtn && !keyBtn.classList.contains("correct")) keyBtn.classList.add("present");
     } else {
       cell.classList.add("absent");
-      const keyBtn = keyElements.find(k => k.textContent.toLowerCase() === l);
+      const keyBtn = Array.from(document.querySelectorAll(".key"))
+        .find(k => k.textContent.toLowerCase() === l);
+
       if (keyBtn && !keyBtn.classList.contains("correct") && !keyBtn.classList.contains("present")) keyBtn.classList.add("absent");
     }
     cell.style.transform = "scale(1.1)";
@@ -141,7 +145,7 @@ function checkGuess(guess) {
   localStorage.setItem("quortle-guesses", JSON.stringify(guesses));
 
   if (guess === word) {
-    messageDiv.textContent = "🎉 Correct! The word is " + word.toUpperCase();
+    messageDiv.textContent = "Correct! The word is " + word.toUpperCase();
     currentRow = maxRows;
     localStorage.removeItem("quortle-guesses");
   } else {
@@ -161,8 +165,8 @@ document.addEventListener("keydown", (e) => {
 
   if (key === "Enter") {
     handleKey("Enter");
-  } else if (key === "Backspace") {
-    handleKey("Backspace");
+  } else if (key === "⌫" || key === "Backspace") {
+    handleKey("⌫");
   } else if (/^[a-zA-Z]$/.test(key)) {  // only letters
     handleKey(key.toUpperCase());
   }
@@ -187,9 +191,14 @@ function restoreGuesses() {
 
 // Initialize
 window.onload = async () => {
-  await loadValidWords(); 
+  await loadValidWords();
   await fetchWord();
   initBoard();
   initKeyboard();
   restoreGuesses();
 };
+
+const footerYear = document.querySelectorAll(".year");
+footerYear.forEach(copyright => {
+  copyright.innerHTML = new Date().getFullYear();
+});
