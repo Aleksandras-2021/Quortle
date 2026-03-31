@@ -31,5 +31,5 @@ func main() {
 	})
 
 	log.Println("Server running on :80")
-	http.ListenAndServe(":80", corsHandler)
+	log.Fatal(http.ListenAndServe(":80", corsHandler))
 }
