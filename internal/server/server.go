@@ -37,5 +37,5 @@ func (s *Server) Start() {
 	}
 
 	log.Printf("HTTPS server running on :443 for domain %s\n", s.Domain)
-	log.Fatal(server.ListenAndServeTLS("", ""))
+	server.ListenAndServeTLS("", "")
 }
