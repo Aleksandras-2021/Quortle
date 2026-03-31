@@ -1,20 +1,21 @@
 package main
 
 import (
-	"log"
 	"net/http"
 
 	"Quortle/internal/api"
 	"Quortle/internal/repository"
+	"Quortle/internal/server"
 	"Quortle/internal/services"
 )
 
 func main() {
+	// Setup repository, service, and API handler
 	repo := &repository.WordRepository{FilePath: "words.txt"}
 	svc := services.NewWordService(repo)
 	handler := api.NewHandler(svc)
 
-	mux := handler.Routes() // create once
+	mux := handler.Routes() // reuse routes
 
 	// Wrap mux with CORS
 	corsHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -27,9 +28,10 @@ func main() {
 			return
 		}
 
-		mux.ServeHTTP(w, r) // reuse mux
+		mux.ServeHTTP(w, r)
 	})
 
-	log.Println("Server running on :80")
-	log.Fatal(http.ListenAndServe(":80", corsHandler))
+	// Start HTTPS server
+	s := server.NewServer(corsHandler, "quortle.eu")
+	s.Start()
 }
