@@ -30,6 +30,6 @@ func main() {
 		mux.ServeHTTP(w, r) // reuse mux
 	})
 
-	log.Println("Server running on :8080")
-	http.ListenAndServe(":8080", corsHandler)
+	log.Println("Server running on :80")
+	http.ListenAndServe(":80", corsHandler)
 }
