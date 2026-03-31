@@ -10,14 +10,12 @@ import (
 )
 
 func main() {
-	// Setup repository, service, and API handler
 	repo := &repository.WordRepository{FilePath: "words.txt"}
 	svc := services.NewWordService(repo)
 	handler := api.NewHandler(svc)
 
-	mux := handler.Routes() // reuse routes
+	mux := handler.Routes()
 
-	// Wrap mux with CORS
 	corsHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
@@ -31,7 +29,6 @@ func main() {
 		mux.ServeHTTP(w, r)
 	})
 
-	// Start HTTPS server
 	s := server.NewServer(corsHandler, "quortle.eu")
 	s.Start()
 }
