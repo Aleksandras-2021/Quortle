@@ -20,7 +20,6 @@ func main() {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
-	//Database setup
 	ConnectDatabase()
 	DB.Exec("CREATE SCHEMA IF NOT EXISTS quortle")
 	if err := DB.AutoMigrate(models.AllModels...); err != nil {
@@ -28,16 +27,14 @@ func main() {
 	}
 	syncWordsToDB("words.txt")
 
-	// Initialize services
 	repo := &repository.WordRepository{FilePath: "words.txt"}
+
 	wordSvc := services.NewWordService(repo)
 	userSvc := services.NewUserService(DB)
 
-	// Initialize Gin router via your Handler
 	handler := api.NewHandler(wordSvc, userSvc)
 	router := handler.Routes()
 
-	// CORS middleware
 	router.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"*"},
 		AllowMethods:     []string{"GET", "POST", "OPTIONS"},

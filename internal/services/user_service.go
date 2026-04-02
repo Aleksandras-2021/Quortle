@@ -5,6 +5,7 @@ import (
 
 	"errors"
 
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
@@ -17,13 +18,14 @@ func NewUserService(db *gorm.DB) *UserService {
 }
 
 func (s *UserService) CreateUser(username, password string) error {
-	if username == "" || password == "" {
-		return errors.New("username and password required")
+	hashed, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return err
 	}
 
 	user := models.User{
 		Username:     username,
-		PasswordHash: password,
+		PasswordHash: string(hashed),
 	}
 
 	return s.db.Create(&user).Error
@@ -40,4 +42,9 @@ func (s *UserService) GetUser(username string) (*models.User, error) {
 	}
 
 	return &user, nil
+}
+
+func (s *UserService) CheckPassword(user *models.User, password string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password))
+	return err == nil
 }

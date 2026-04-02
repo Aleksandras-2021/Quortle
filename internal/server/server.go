@@ -22,19 +22,16 @@ func NewServer(handler http.Handler, domain string) *Server {
 }
 
 func (s *Server) Start() {
-	// Load .env
 	_ = godotenv.Load()
 
 	localMode := os.Getenv("LOCAL") == "true"
 
 	if localMode {
-		// LOCAL HTTP mode
 		log.Println("Starting server in LOCAL HTTP mode on :" + os.Getenv("LOCAL_PORT"))
 		log.Fatal(http.ListenAndServe(":"+os.Getenv("LOCAL_PORT"), s.Handler))
 		return
 	}
 
-	// PRODUCTION HTTPS mode
 	certManager := &autocert.Manager{
 		Cache:      autocert.DirCache("certs"),
 		Prompt:     autocert.AcceptTOS,

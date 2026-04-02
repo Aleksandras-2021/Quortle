@@ -1,6 +1,7 @@
 const board = document.getElementById("board");
 const keyboardDiv = document.getElementById("keyboard");
 const messageDiv = document.getElementById("message");
+const navbarDiv = document.getElementById("navbar");
 
 let word = "";
 const maxRows = 5;
@@ -193,10 +194,18 @@ function restoreGuesses() {
 window.onload = async () => {
   await loadValidWords();
   await fetchWord();
+  initNavbar();
   initBoard();
   initKeyboard();
   restoreGuesses();
 };
+
+function initNavbar() {
+  const homeLink = document.createElement("a");
+  homeLink.href = "/";
+  homeLink.textContent = "Home";
+  navbarDiv.appendChild(homeLink);
+}
 
 const footerYear = document.querySelectorAll(".year");
 footerYear.forEach(copyright => {
