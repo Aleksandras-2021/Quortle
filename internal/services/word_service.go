@@ -1,11 +1,11 @@
 package services
 
 import (
+	"Quortle/internal/repository"
 	"fmt"
 	"math/rand"
+	"os"
 	"time"
-
-	"Quortle/internal/repository"
 )
 
 type WordService struct {
@@ -32,4 +32,8 @@ func (s *WordService) GetWordOfTheDay() (string, error) {
 	word := words[days%len(words)]
 
 	return word, nil
+}
+
+func (s *WordService) GetWordsTxt() ([]byte, error) {
+	return os.ReadFile("words.txt")
 }

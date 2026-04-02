@@ -29,8 +29,8 @@ func (s *Server) Start() {
 
 	if localMode {
 		// LOCAL HTTP mode
-		log.Println("Starting server in LOCAL HTTP mode on :8080")
-		log.Fatal(http.ListenAndServe(":8080", s.Handler))
+		log.Println("Starting server in LOCAL HTTP mode on :" + os.Getenv("LOCAL_PORT"))
+		log.Fatal(http.ListenAndServe(":"+os.Getenv("LOCAL_PORT"), s.Handler))
 		return
 	}
 
@@ -42,7 +42,7 @@ func (s *Server) Start() {
 	}
 
 	go func() {
-		http.ListenAndServe(":80", certManager.HTTPHandler(nil))
+		http.ListenAndServe(":"+os.Getenv("PRODUCTION_PORT"), certManager.HTTPHandler(nil))
 	}()
 
 	server := &http.Server{

@@ -1,34 +1,50 @@
 package main
 
 import (
-	"net/http"
-
 	"Quortle/internal/api"
+	models "Quortle/internal/models"
 	"Quortle/internal/repository"
 	"Quortle/internal/server"
 	"Quortle/internal/services"
+	"log"
+
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
+	// Load .env
+	LoadEnv()
+
+	if GetEnv("GIN_MODE") == "release" {
+		gin.SetMode(gin.ReleaseMode)
+	}
+
+	//Database setup
+	ConnectDatabase()
+	DB.Exec("CREATE SCHEMA IF NOT EXISTS quortle")
+	if err := DB.AutoMigrate(models.AllModels...); err != nil {
+		log.Fatal("Migration failed:", err)
+	}
+	syncWordsToDB("words.txt")
+
+	// Initialize services
 	repo := &repository.WordRepository{FilePath: "words.txt"}
-	svc := services.NewWordService(repo)
-	handler := api.NewHandler(svc)
+	wordSvc := services.NewWordService(repo)
+	userSvc := services.NewUserService(DB)
 
-	mux := handler.Routes()
+	// Initialize Gin router via your Handler
+	handler := api.NewHandler(wordSvc, userSvc)
+	router := handler.Routes()
 
-	corsHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+	// CORS middleware
+	router.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"*"},
+		AllowMethods:     []string{"GET", "POST", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+		AllowCredentials: true,
+	}))
 
-		if r.Method == "OPTIONS" {
-			w.WriteHeader(http.StatusOK)
-			return
-		}
-
-		mux.ServeHTTP(w, r)
-	})
-
-	s := server.NewServer(corsHandler, "quortle.eu")
+	s := server.NewServer(router, GetEnv("DOMAIN"))
 	s.Start()
 }

@@ -2,51 +2,43 @@ package api
 
 import (
 	"Quortle/internal/services"
-	"encoding/json"
-	"net/http"
-	"os"
+
+	"github.com/gin-gonic/gin"
 )
 
 type Handler struct {
-	service *services.WordService
+	wordHandler *WordHandler
+	userHandler *UserHandler
 }
 
-func NewHandler(s *services.WordService) *Handler {
-	return &Handler{service: s}
+func NewHandler(wordSvc *services.WordService, userSvc *services.UserService) *Handler {
+	return &Handler{
+		wordHandler: NewWordHandler(wordSvc),
+		userHandler: NewUserHandler(userSvc),
+	}
 }
 
-func (h *Handler) Routes() http.Handler {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/word/random", h.GetWordOfTheDay)
+// Routes returns a Gin Engine
+func (h *Handler) Routes() *gin.Engine {
+	r := gin.Default()
 
-	mux.HandleFunc("/words.txt", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "text/plain")
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-
-		data, err := os.ReadFile("words.txt")
-		if err != nil {
-			http.Error(w, "Unable to read words.txt", http.StatusInternalServerError)
-			return
-		}
-		w.Write(data)
+	// Serve frontend files
+	r.GET("/", func(c *gin.Context) {
+		c.File("./frontend/index.html")
 	})
+	// Word routes
+	r.GET("/word/random", h.wordHandler.GetWordOfTheDay)
+	r.GET("/words.txt", h.wordHandler.GetWordsTxt)
 
-	fs := http.FileServer(http.Dir("./frontend"))
-	mux.Handle("/", http.StripPrefix("/", fs))
+	// User routes
+	userRoutes := r.Group("/users")
+	{
+		// POST /users
+		userRoutes.POST("", h.userHandler.CreateUser)
 
-	return mux
-}
-
-func (h *Handler) GetWordOfTheDay(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
-	word, err := h.service.GetWordOfTheDay()
-	if err != nil || word == "" {
-		http.Error(w, "No word available", http.StatusInternalServerError)
-		return
+		// GET /users/:username
+		userRoutes.GET("/:username", h.userHandler.GetUser)
 	}
 
-	json.NewEncoder(w).Encode(map[string]string{
-		"word": word,
-	})
+	return r
 }
