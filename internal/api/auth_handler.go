@@ -67,3 +67,35 @@ func (h *AuthHandler) Login(c *gin.Context) {
 
 	c.JSON(200, gin.H{"message": "Logged in successfully"})
 }
+
+func (h *AuthHandler) Logout(c *gin.Context) {
+	c.SetCookie(
+		"token",
+		"",
+		-1,
+		"/",
+		"",
+		false,
+		true,
+	)
+
+	c.JSON(200, gin.H{"message": "Logged out successfully"})
+}
+
+func (h *AuthHandler) Me(c *gin.Context) {
+	token, err := c.Cookie("token")
+	if err != nil {
+		c.JSON(401, gin.H{"error": "Not authenticated"})
+		return
+	}
+
+	claims, err := auth.ValidateToken(token)
+	if err != nil {
+		c.JSON(401, gin.H{"error": "Invalid token"})
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"username": claims.Username,
+	})
+}

@@ -81,7 +81,6 @@ body {
   animation: shake 0.3s;
 }
 
-/* Footer */
 .footer {
   position: fixed;
   left: 0;
@@ -90,6 +89,7 @@ body {
   background-color: #121213;
   color: white;
   text-align: center;
+  font-size: 13px;
 }
 
 #message {
@@ -97,3 +97,103 @@ body {
   font-size: 1.2em;
   color: #c9b458;
 } 
+
+/* Auth Page */
+.button-group {
+  display: flex;
+  gap: 10px;
+}
+
+#auth-form {
+ /* background: white; */
+  max-width: 320px;
+  margin: 40px auto;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Inputs */
+#auth-form input {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: 0.2s;
+}
+
+#auth-form input:focus {
+  outline: none;
+  border-color: #4CAF50;
+  box-shadow: 0 0 4px rgba(76, 175, 80, 0.3);
+}
+
+/* Buttons */
+#auth-form button {
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+/* Register button */
+#auth-form button:first-of-type {
+  background: #4CAF50;
+  color: white;
+}
+
+#auth-form button:first-of-type:hover {
+  background: #43a047;
+}
+
+/* Login button */
+#auth-form button:last-of-type {
+  background: #2196F3;
+  color: white;
+}
+
+#auth-form button:last-of-type:hover {
+  background: #1e88e5;
+}
+
+
+#navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 30px;
+  background: #121213;
+  border-bottom: 1px solid #494949;
+  font-size:  1em;
+}
+
+#navbar a {
+  text-decoration: none;
+  color: #ffffff;
+  font-weight: 500;
+}
+
+#navbar span {
+  margin-left: auto;
+  margin-right: 10px;
+  color: #555;
+}
+
+#navbar button {
+  padding: 6px 10px;
+  border: none;
+  border-radius: 6px;
+  background: #f44336;
+  color: white;
+  cursor: pointer;
+}
+
+#navbar button:hover {
+  background: #e53935;
+}

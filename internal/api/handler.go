@@ -28,6 +28,8 @@ func (h *Handler) Routes() *gin.Engine {
 	{
 		authRoutes.POST("/register", h.authHandler.Register)
 		authRoutes.POST("/login", h.authHandler.Login)
+		authRoutes.GET("/me", h.authHandler.Me)
+		authRoutes.POST("/logout", h.authHandler.Logout)
 	}
 
 	r.GET("/word/random", h.wordHandler.GetWordOfTheDay)

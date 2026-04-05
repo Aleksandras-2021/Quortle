@@ -31,7 +31,6 @@ func (r *WordRepository) LoadWords() ([]string, error) {
 	return words, scanner.Err()
 }
 
-// Save remaining words back to words.txt
 func (r *WordRepository) SaveWords(words []string) error {
 	file, err := os.Create(r.FilePath)
 	if err != nil {

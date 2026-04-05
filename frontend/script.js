@@ -200,14 +200,98 @@ window.onload = async () => {
   restoreGuesses();
 };
 
-function initNavbar() {
+async function initNavbar() {
+  navbarDiv.innerHTML = "";
+
   const homeLink = document.createElement("a");
   homeLink.href = "/";
   homeLink.textContent = "Home";
+
   navbarDiv.appendChild(homeLink);
+
+  try {
+    const res = await fetch("/auth/me", {
+      credentials: "include",
+    });
+
+    if (!res.ok) throw new Error();
+
+    const data = await res.json();
+
+    // 👤 Logged in UI
+    const userSpan = document.createElement("span");
+    userSpan.textContent = `👤 ${data.username}`;
+
+    const logoutBtn = document.createElement("button");
+    logoutBtn.textContent = "Logout";
+    logoutBtn.onclick = logout;
+
+    navbarDiv.appendChild(userSpan);
+    navbarDiv.appendChild(logoutBtn);
+
+  } catch {
+    const loginLink = document.createElement("a");
+    loginLink.href = "/auth.html";
+    loginLink.textContent = "Login/Register";
+
+    navbarDiv.appendChild(loginLink);
+  }
+}
+
+async function logout() {
+  await fetch("/auth/logout", {
+    method: "POST",
+    credentials: "include",
+  });
+
+  window.location.href = "/";
 }
 
 const footerYear = document.querySelectorAll(".year");
 footerYear.forEach(copyright => {
   copyright.innerHTML = new Date().getFullYear();
 });
+
+
+
+const API_BASE = "";
+
+async function register() {
+  const username = document.getElementById("username").value;
+  const password = document.getElementById("password").value;
+
+  const res = await fetch(API_BASE + "/auth/register", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify({ username, password }),
+  });
+
+  const data = await res.json();
+  document.getElementById("message").innerText =
+    data.message || data.error;
+}
+
+async function login() {
+  const username = document.getElementById("username").value;
+  const password = document.getElementById("password").value;
+
+  const res = await fetch(API_BASE + "/auth/login", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify({ username, password }),
+  });
+
+  const data = await res.json();
+  document.getElementById("message").innerText =
+    data.message || data.error;
+
+  if (res.ok) {
+    window.location.href = "/";
+  }
+}
